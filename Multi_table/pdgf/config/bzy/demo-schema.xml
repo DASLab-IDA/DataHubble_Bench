@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  <!DOCTYPE schema SYSTEM "structure/pdgfSchema.dtd">-->
+
+<schema name="item" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="structure/pdgfSchema.xsd">
+    <!-- All data is derived from this starting seed.
+    If this seed is the same, the generated data will the same on each computer/node/platform.
+    Change this seed to generate a different data set.-->
+    <seed>1236549870</seed>
+
+    <!-- Global parameters (affect multiple tables)-->
+    <property name="NULL_CHANCE" type="double">0.00025</property>
+ 
+    <!-- serial keys like customer_sk date_sk etc.. start at 0 or at 1 or... -->
+    <property name="SK_ID_OFFSET" type="double">0</property>
+
+    <rng name="PdgfDefaultRandom"/>
+    <!-- <property name="SF" type="double">1</property> -->
+
+    <!-- store -->
+    <table name="store">
+        <size>1000000 * ${SF}</size>
+
+        <field name="s_store_sk" size="19" type="BIGINT" primary="true">
+            <gen_IdGenerator> <min>${SK_ID_OFFSET}</min> </gen_IdGenerator>
+        </field>
+
+        <field name="s_store_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="s_store_sk"/>
+            </gen_OtherFieldValueGenerator>
+        </field>
+  
+        <field name="s_store_id" size="16" type="CHAR" primary="false">
+            <gen_RandomAString>
+                <size>16.0</size>
+                <characters>0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ</characters>
+                <min>5</min>
+            </gen_RandomAString>
+        </field>
+
+        <field name="s_store_name" size="50" type="VARCHAR" primary="false">
+            <gen_RandomAString>
+                <size>50.0</size>
+                <characters>ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz</characters>
+                <min>10</min>
+            </gen_RandomAString>   
+        </field>
+
+        <!-- decimalSize="5,2"-->
+        <field name="s_gmt_offset" size="5" type="NUMERIC" primary="false">
+            <gen_WeightedListItem filename="dicts/bigbench/ds-genProbabilities.txt" list="fips_county" valueColumn="gmt" weightColumn="uniform">
+                <sameChoiceAs field="s_county" generatorByID="countyChooser"/>
+            </gen_WeightedListItem>
+        </field>
+
+        <field name="s_gmt_offset1" size="5" type="NUMERIC" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="s_gmt_offset"/>
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+    </table>
+</schema>
+    <!-- <table name="websales_home_myshop_fact_table_10t">
+	
+        <size>1000000 * ${SF}</size>
+
+
+        <field name="id" size="5" type="NUMERIC">
+            <gen_DictList>
+                <file>dicts/ids.dict</file>
+            </gen_DictList>
+        </field>
+
+        <field name="quantity" size="5" type="NUMERIC">
+            <gen_DoubleGenerator>
+                <minD>1</minD>
+                <maxD>100</maxD>
+                <decimalPlaces>0</decimalPlaces>
+            </gen_DoubleGenerator>
+        </field>
+
+        <field name="quantity1" size="5" type="NUMERIC">
+            <gen_OtherFieldValueGenerator>
+                <reference field="quantity"/>
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="discount" size="10" type="NUMERIC">
+            <gen_DoubleGenerator>
+                <minD>1</minD>
+                <maxD>9</maxD>
+                <decimalPlaces>0</decimalPlaces>
+            </gen_DoubleGenerator>
+        </field>
+
+        <field name="discount1" size="10" type="NUMERIC">
+            <gen_OtherFieldValueGenerator>
+                <reference field="discount"/>
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="solddate" size="" type="DATE">
+            <gen_DateGenerator>
+                <startDate>2017-01-01</startDate>
+                <endDate>2022-01-01</endDate>
+                <format>yyyy-MM-dd</format>
+            </gen_DateGenerator>
+        </field>
+
+        <field name="customer" size="10" type="VARCHAR">
+            <gen_DictList>
+                <file>dicts/name.dict</file>
+            </gen_DictList>
+        </field>
+
+        <field name="age" size="5" type="NUMERIC">
+            <gen_DoubleGenerator>
+                <minD>15</minD>
+                <maxD>40</maxD>
+                <decimalPlaces>0</decimalPlaces>
+            </gen_DoubleGenerator>
+        </field>
+
+        <field name="age1" size="5" type="NUMERIC">
+            <gen_OtherFieldValueGenerator>
+                <reference field="age"/>
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="gender" size="5" type="CHAR">
+            <gen_DictList>
+                <file>dicts/gender.dict</file>
+            </gen_DictList>
+        </field>
+
+        <field name="province" size="10" type="VARCHAR">
+            <gen_DictList>
+                <file>dicts/province.dict</file>
+            </gen_DictList>
+        </field>
+
+        <field name="nationality" size="5" type="VARCHAR">
+            <gen_DictList>
+                <file>dicts/nationality.dict</file>
+            </gen_DictList>
+        </field>
+    </table> -->
+

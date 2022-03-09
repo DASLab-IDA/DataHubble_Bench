@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<generation>
+ 
+	<!-- DEFAULT Scheduler for all Tables, if no table specific scheduler is specified-->
+	<!--  used for "normal" tables. Normal "non-refresh" tables are excluded from generation during refresh phase  -->
+	<scheduler name="DefaultScheduler"></scheduler>
+
+	<!-- DEFAULT output for all Tables, if no table specific output is specified-->
+	<output name="CSVRowOutput">
+		<fileTemplate>outputDir + table.getName() + fileEnding</fileTemplate>
+		<outputDir>output/</outputDir>
+		<fileEnding>.dat</fileEnding>
+		<delimiter>|</delimiter>
+		<charset>UTF-8</charset>
+	</output>
+
+	<schema name="demo">
+		<tables>
+    		<table name="websales_home_myshop_fact_table_10t">
+			<table name="store">
+		</tables>
+	</schema>
+</generation>

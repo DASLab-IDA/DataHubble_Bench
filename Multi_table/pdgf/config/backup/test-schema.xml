@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  <!DOCTYPE schema SYSTEM "structure/pdgfSchema.dtd">-->
+
+<schema name="item" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="structure/pdgfSchema.xsd">
+    <!-- All data is derived from this starting seed.
+    If this seed is the same, the generated data will the same on each computer/node/platform.
+    Change this seed to generate a different data set.-->
+    <seed>1234567890</seed>
+
+    <rng name="PdgfDefaultRandom"/>
+    <property name="SF" type="double">1</property>
+    <table name="test">
+        <size>1000000 * ${SF}</size>
+
+
+        <field name="itemname" size="50" type="VARCHAR">
+            <gen_DictList>
+                <file>dicts/itemname.dict</file>
+            </gen_DictList>
+        </field>
+
+        <field name="price" size="7" type="NUMERIC">
+            <gen_DictList>
+                <file>dicts/price.dict</file>
+            </gen_DictList>
+        </field>
+
+        <field name="price1" size="7" type="NUMERIC">
+            <gen_OtherFieldValueGenerator>
+                <reference field="price"/>
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="quantity" size="5" type="NUMERIC">
+            <gen_DoubleGenerator>
+                <minD>1</minD>
+                <maxD>100</maxD>
+                <decimalPlaces>0</decimalPlaces>
+            </gen_DoubleGenerator>
+        </field>
+
+        <field name="quantity1" size="5" type="NUMERIC">
+            <gen_OtherFieldValueGenerator>
+                <reference field="quantity"/>
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="discount" size="10" type="NUMERIC">
+            <gen_DoubleGenerator>
+                <minD>1</minD>
+                <maxD>9</maxD>
+                <decimalPlaces>0</decimalPlaces>
+            </gen_DoubleGenerator>
+        </field>
+
+        <field name="discount1" size="10" type="NUMERIC">
+            <gen_OtherFieldValueGenerator>
+                <reference field="discount"/>
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="category" size="20" type="VARCHAR">
+            <gen_DictList>
+                <file>dicts/category.dict</file>
+            </gen_DictList>
+        </field>
+
+        <field name="solddate" size="" type="DATE">
+            <gen_DateGenerator>
+                <disableRng>true</disableRng>
+                <startDate>2016-01-01</startDate>
+                <endDate>2020-01-01</endDate>
+                <format>yyyy-MM-dd</format>
+            </gen_DateGenerator>
+        </field>
+
+        <field name="customer" size="10" type="VARCHAR">
+            <gen_DictList>
+                <file>dicts/name.dict</file>
+            </gen_DictList>
+        </field>
+
+        <field name="age" size="5" type="NUMERIC">
+            <gen_DoubleGenerator>
+                <minD>15</minD>
+                <maxD>40</maxD>
+                <decimalPlaces>0</decimalPlaces>
+            </gen_DoubleGenerator>
+        </field>
+
+        <field name="age1" size="5" type="NUMERIC">
+            <gen_OtherFieldValueGenerator>
+                <reference field="age"/>
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="gender" size="5" type="CHAR">
+            <gen_DictList>
+                <file>dicts/gender.dict</file>
+            </gen_DictList>
+        </field>
+
+        <field name="province" size="10" type="VARCHAR">
+            <gen_DictList>
+                <file>dicts/province.dict</file>
+            </gen_DictList>
+        </field>
+
+        <field name="nationality" size="5" type="VARCHAR">
+            <gen_DictList>
+                <file>dicts/nationality.dict</file>
+            </gen_DictList>
+        </field>
+
+        <field name="itemdesc" size="" type="VARCHAR">
+            <gen_DictList>
+                <file>dicts/desc.dict</file>
+            </gen_DictList>
+        </field>
+    </table>
+</schema>

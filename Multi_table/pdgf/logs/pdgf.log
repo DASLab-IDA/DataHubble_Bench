@@ -1,0 +1,117 @@
+DEBUG main pdgf.Controller - execution root folder: /home/scidb/DataGeneration/pdgf
+DEBUG main pdgf.Controller - found plugin folder: /home/scidb/DataGeneration/pdgf/lib
+DEBUG main pdgf.util.ClassLoading.PluginLoader - Adding File: pdgf.jar to classpath
+DEBUG main pdgf.util.ClassLoading.PluginLoader - Adding File: lucene-core-3.6.0.jar to classpath
+DEBUG main pdgf.util.ClassLoading.PluginLoader - Adding File: serializer.jar to classpath
+DEBUG main pdgf.util.ClassLoading.PluginLoader - Adding File: resolver.jar to classpath
+DEBUG main pdgf.util.ClassLoading.PluginLoader - Adding File: xercesImpl.jar to classpath
+DEBUG main pdgf.util.ClassLoading.PluginLoader - Adding File: lucene-spellchecker-3.6.0.jar to classpath
+DEBUG main pdgf.util.ClassLoading.PluginLoader - Adding File: javassist.jar to classpath
+DEBUG main pdgf.util.ClassLoading.PluginLoader - Adding File: xml-apis.jar to classpath
+DEBUG main pdgf.util.ClassLoading.PluginLoader - Adding File: log4j-1.2.16.jar to classpath
+INFO main pdgf.Controller - ################################################################################
+                     PDGF_Demo(single cpu) v3.0_SVNrev88_b4
+                       Parallel Data Generation Framework
+    by: Frank M., Danisch M., Rabl T. http://www.paralleldatageneration.org
+################################################################################
+for a command overview start with commandline parameter: -help
+or type "help" in the built in shell: PDGF:> 
+
+INFO main pdgf.actions.SetCloseWhenDoneAction - Set closeWhenDone from: false to: true
+INFO main pdgf.actions.SetScaleFactorAction - Set project main scale factor from -notSet- to 1
+WARN main pdgf.core.dbSchema.Project - set XML <property name="SF"> to: 1.0
+DEBUG main pdgf.actions.LoadConfigAction - Config file "schema.xml" not found. Searching for file in standard config file dir: config/
+INFO main pdgf.actions.LoadConfigAction - 
+Loading cfg file: /home/scidb/DataGeneration/pdgf/config/schema.xml
+INFO main pdgf.core.dbSchema.Project - Loading  <schema> config file
+INFO main pdgf.core.dbSchema.Project - 16: XML <property name="SF">1.0 was already defined in config file or is manually overridden by a user set commandline argument. Currently assigned value: '1.0' and will remain unchanged at this value
+DEBUG main pdgf.core.dbSchema.Project - Load time for config file (ms):335
+INFO main pdgf.core.dbSchema.Project - Loading sucessfull.
+DEBUG main pdgf.actions.LoadConfigAction - Config file "generation.xml" not found. Searching for file in standard config file dir: config/
+INFO main pdgf.actions.LoadConfigAction - 
+Loading cfg file: /home/scidb/DataGeneration/pdgf/config/generation.xml
+INFO main pdgf.core.dbSchema.Project - Loading  <generation> config file
+DEBUG main pdgf.output.FileOutputSkeleton - CSVRowOutput - use File ending for output: .dat
+DEBUG main pdgf.output.FileOutputSkeleton - Using charset "UTF-8" for output files
+DEBUG main pdgf.core.dbSchema.Project - Load time for config file (ms):11
+INFO main pdgf.core.dbSchema.Project - Loading sucessfull.
+INFO main pdgf.core.dbSchema.Project - All required config files are loaded.
+INFO main pdgf.core.dataGenerator.DataGenerator - Initializing system...
+DEBUG main pdgf.core.dataGenerator.DataGenerator - preinitialization of project finished. Next task: cloning per worker
+INFO main pdgf.core.dataGenerator.DataGenerator - initialized 0h:00m:00s:398ms
+INFO main pdgf.core.dataGenerator.DataGenerator - Starting data generation proccess...
+INFO main pdgf.core.dataGenerator.scheduler.MetaScheduler - 
+generating 1/9 "store"	  rows: 12 of 12
+DEBUG Worker0/1 pdgf.core.dataGenerator.worker.AbstractWorker - Node: 1 worker 1/1 is now running
+DEBUG main pdgf.core.dataGenerator.scheduler.MetaScheduler - Data generation procces started on node 1/1. Created 1 workers for this task.
+DEBUG Worker0/1 pdgf.core.dataGenerator.scheduler.DefaultScheduler - UpdateScheduler: Rows: 11 fields per second: 13200
+INFO :PausedThread pdgf.core.dataGenerator.scheduler.MetaScheduler -   finished 1/9 "store"	  in: 0h:00m:00s:9ms size: 494 B speed: 53.6 KiB/s
+INFO :PausedThread pdgf.core.dataGenerator.scheduler.MetaScheduler - 
+generating 2/9 "store_sales"	  rows: 90000 of 90000
+DEBUG Worker0/1 pdgf.core.dataGenerator.scheduler.DefaultScheduler - UpdateScheduler: Rows: 89999 fields per second: 1925718
+INFO :PausedThread pdgf.core.dataGenerator.scheduler.MetaScheduler -   finished 2/9 "store_sales"	  in: 0h:00m:01s:594ms size: 17.9 MiB speed: 11.2 MiB/s
+INFO :PausedThread pdgf.core.dataGenerator.scheduler.MetaScheduler - 
+generating 3/9 "web_returns"	  rows: 9000 of 9000
+DEBUG Worker0/1 pdgf.core.dataGenerator.scheduler.DefaultScheduler - UpdateScheduler: Rows: 8999 fields per second: 2194878
+INFO :PausedThread pdgf.core.dataGenerator.scheduler.MetaScheduler -   finished 3/9 "web_returns"	  in: 0h:00m:00s:42ms size: 475.6 KiB speed: 11.1 MiB/s
+INFO :PausedThread pdgf.core.dataGenerator.scheduler.MetaScheduler - 
+generating 4/9 "store_returns"	  rows: 9000 of 9000
+DEBUG Worker0/1 pdgf.core.dataGenerator.scheduler.DefaultScheduler - UpdateScheduler: Rows: 8999 fields per second: 2117411
+INFO :PausedThread pdgf.core.dataGenerator.scheduler.MetaScheduler -   finished 4/9 "store_returns"	  in: 0h:00m:00s:52ms size: 851.2 KiB speed: 16.0 MiB/s
+INFO :PausedThread pdgf.core.dataGenerator.scheduler.MetaScheduler - 
+generating 5/9 "customer"	  rows: 100000 of 100000
+DEBUG Worker0/1 pdgf.core.dataGenerator.scheduler.DefaultScheduler - UpdateScheduler: Rows: 99999 fields per second: 3578911
+INFO :PausedThread pdgf.core.dataGenerator.scheduler.MetaScheduler -   finished 5/9 "customer"	  in: 0h:00m:00s:482ms size: 19.2 MiB speed: 39.8 MiB/s
+INFO :PausedThread pdgf.core.dataGenerator.scheduler.MetaScheduler - 
+generating 6/9 "web_sales"	  rows: 90000 of 90000
+DEBUG Worker0/1 pdgf.core.dataGenerator.scheduler.DefaultScheduler - UpdateScheduler: Rows: 89999 fields per second: 1616143
+INFO :PausedThread pdgf.core.dataGenerator.scheduler.MetaScheduler -   finished 6/9 "web_sales"	  in: 0h:00m:01s:789ms size: 16.5 MiB speed: 9.2 MiB/s
+INFO :PausedThread pdgf.core.dataGenerator.scheduler.MetaScheduler - 
+generating 7/9 "item"	  rows: 18000 of 18000
+DEBUG Worker0/1 pdgf.core.dataGenerator.scheduler.DefaultScheduler - UpdateScheduler: Rows: 17999 fields per second: 938336
+INFO :PausedThread pdgf.core.dataGenerator.scheduler.MetaScheduler -   finished 7/9 "item"	  in: 0h:00m:00s:225ms size: 41.7 MiB speed: 185.4 MiB/s
+INFO :PausedThread pdgf.core.dataGenerator.scheduler.MetaScheduler - 
+generating 8/9 "product_reviews"	  rows: 90900 of 90900
+DEBUG Worker0/1 pdgf.core.dataGenerator.scheduler.DefaultScheduler - UpdateScheduler: Rows: 90899 fields per second: 2036952
+INFO :PausedThread pdgf.core.dataGenerator.scheduler.MetaScheduler -   finished 8/9 "product_reviews"	  in: 0h:00m:00s:363ms size: 16.3 MiB speed: 45.0 MiB/s
+INFO :PausedThread pdgf.core.dataGenerator.scheduler.MetaScheduler - 
+generating 9/9 "date_dim"	  rows: 109573 of 109573
+DEBUG Worker0/1 pdgf.core.dataGenerator.scheduler.DefaultScheduler - UpdateScheduler: Rows: 109572 fields per second: 2490272
+INFO :PausedThread pdgf.core.dataGenerator.DataGenerator - All work done
+DEBUG :PausedThread pdgf.core.dataGenerator.scheduler.MetaScheduler - Node 1: All workers stopped successfully!
+DEBUG :PausedThread pdgf.core.dataGenerator.DataGenerator - Node 1 Max time of a worker: 0h:00m:04s:778ms average time: 0h:00m:04s:778ms
+DEBUG :PausedThread pdgf.core.dataGenerator.DataGenerator - Node 1 Generator overall time: 0h:00m:04s:785ms
+INFO :PausedThread pdgf.core.dataGenerator.DataGenerator - Statistics
+=========
+Overall time	0h:00m:04s:785ms
+Generated	116.4 MiB
+Speed		24.3 MiB/s
+
+INFO :PausedThread pdgf.core.dataGenerator.DataGenerator - Node 1. logged detailed processing statistics to file:/home/scidb/DataGeneration/pdgf/logs/GenerationStatistics_1.csv
+INFO :PausedThread pdgf.core.dataGenerator.DataGenerator - Node 1. logged detailed processing statistics to file:/home/scidb/DataGeneration/pdgf/logs/TableGenerationStatistics_1.csv
+DEBUG :PausedThread pdgf.core.dataGenerator.DataGenerator - 1646795135869;1;1;multitable;1.0;1;ALL#SCHEDULERS;6711080;0;0;0;0;0;6711080;100.0;1.14
+1646795135869;1;1;multitable;1.0;1;ALL#worker#0;4712788362;4120000000;0;0;18;50000000;4762788362;98.95;99.491
+1646795135869;1;1;multitable;1.0;1;All#PausedThread;43153824;0;0;0;0;0;43153824;100.0;1.902
+1646795135869;1;1;multitable;1.0;1;pdgf.core.dataGenerator.scheduler.DefaultScheduler#customer;325354;0;0;0;0;0;325354;100.0;1.007
+1646795135869;1;1;multitable;1.0;1;pdgf.core.dataGenerator.scheduler.DefaultScheduler#date_dim;261096;0;0;0;0;0;261096;100.0;1.005
+1646795135869;1;1;multitable;1.0;1;pdgf.core.dataGenerator.scheduler.DefaultScheduler#item;240458;0;0;0;0;0;240458;100.0;1.005
+1646795135869;1;1;multitable;1.0;1;pdgf.core.dataGenerator.scheduler.DefaultScheduler#product_reviews;160334;0;0;0;0;0;160334;99.999;1.003
+1646795135869;1;1;multitable;1.0;1;pdgf.core.dataGenerator.scheduler.DefaultScheduler#store;2675895;0;0;0;0;0;2675895;100.0;1.056
+1646795135869;1;1;multitable;1.0;1;pdgf.core.dataGenerator.scheduler.DefaultScheduler#store_returns;216547;0;0;0;0;0;216547;100.0;1.005
+1646795135869;1;1;multitable;1.0;1;pdgf.core.dataGenerator.scheduler.DefaultScheduler#store_sales;362866;0;0;0;0;0;362866;100.0;1.008
+1646795135869;1;1;multitable;1.0;1;pdgf.core.dataGenerator.scheduler.DefaultScheduler#web_returns;186112;0;0;0;0;0;186112;99.999;1.004
+1646795135869;1;1;multitable;1.0;1;pdgf.core.dataGenerator.scheduler.DefaultScheduler#web_sales;498788;0;0;0;0;0;498788;100.0;1.01
+1646795135869;1;1;multitable;1.0;1;pdgf.core.dataGenerator.worker.RowWorker#worker#0;4712685326;4120000000;0;0;18;50000000;4762685326;98.95;99.489
+multitable;multitable;multitable;multitable;multitable;multitable;multitable;multitable;multitable;
+1646795135869;1;1;1.0;1;ALL;4785;122069417;24.3 MiB/s;
+1646795135869;1;1;1.0;1;customer;482;20119774;39.8 MiB/s;
+1646795135869;1;1;1.0;1;item;225;43732140;185.4 MiB/s;
+1646795135869;1;1;1.0;1;product_reviews;363;17136624;45.0 MiB/s;
+1646795135869;1;1;1.0;1;store;9;494;53.6 KiB/s;
+1646795135869;1;1;1.0;1;store_returns;52;871578;16.0 MiB/s;
+1646795135869;1;1;1.0;1;store_sales;1594;18768280;11.2 MiB/s;
+1646795135869;1;1;1.0;1;web_returns;42;487016;11.1 MiB/s;
+1646795135869;1;1;1.0;1;web_sales;1789;17340676;9.2 MiB/s;
+
+INFO :PausedThread pdgf.core.dataGenerator.DataGenerator - Time to stop and flush everything: 0h:00m:00s:5ms
+DEBUG ShutdownHook pdgf.core.dataGenerator.scheduler.MetaScheduler - Node 1: All workers stopped successfully!

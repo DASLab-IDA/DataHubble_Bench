@@ -1,0 +1,1048 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<schema name="multitable">
+
+    <seed>1236549870</seed>
+
+    <rng name="PdgfDefaultRandom" />
+
+    <!-- Global parameters (affect multiple tables)-->
+    <property name="NULL_CHANCE" type="double">0.00025</property>
+
+    <!-- serial keys like customer_sk date_sk etc.. start at 0 or at 1 or... -->
+    <property name="SK_ID_OFFSET" type="double">0</property>
+
+    <!-- Table scaling types -->
+    <property name="SF" type="double">1</property>
+    <property name="SF_sqrt" type="double">Math.sqrt(${SF})</property>
+    \
+    <property name="SF_log_5" type="double">(Math.log(${SF}) / Math.log(5.0d) + 1.0d)</property>
+    <property name="SF_log_1.5" type="double">Math.log(${SF}) / Math.log(1.5d) + 1.0d</property>
+    <property name="SF_linear" type="double">${SF} * (2.0d - (${SF_log_5} * ${SF_sqrt} / ${SF}))</property>
+
+    <!-- Table size -->
+    <property name="item_size_base" type="long">18000.0d</property>
+    <property name="WR_return_web_sale_likelihood" type="double">0.1</property>
+    <property name="return_store_sale_likelihood" type="double">0.1</property>
+    <property name="date_dim_begin_date" type="date">1900-01-01 00:00:00</property>
+    <property name="date_dim_end_date" type="date">2200-01-01 00:00:00</property>
+    <property name="one_day_in_milliseconds" type="double">24.0 * 60.0 * 60.0 * 1000.0</property> <!-- one day -->
+    <property name="anonymous_reviews_per_item" type="double">5</property>
+    <property name="reviews_per_sale" type="double">0.01</property>
+
+    <property name="store_size" type="long">12 * ${SF_sqrt}</property>
+    <property name="customer_size" type="long">100000.0d * ${SF_sqrt}</property>
+    <property name="item_size" type="long">${item_size_base} * ${SF_sqrt}</property>
+    <property name="web_sales_size" type="long">90000.0d * ${SF_linear}</property>
+    <property name="web_returns_size" type="long">${WR_return_web_sale_likelihood} * ${web_sales_size}</property>
+    <property name="store_sales_size" type="long">90000.0d * ${SF_linear}</property>
+    <property name="store_returns_size" type="long">${return_store_sale_likelihood} * ${store_sales_size}</property>
+    <property name="date_dim_size" type="long">(${date_dim_end_date} - ${date_dim_begin_date}) / ${one_day_in_milliseconds}</property>
+    <property name="product_reviews_size" type="long">(${item_size} * ${anonymous_reviews_per_item}) + (${web_sales_size} * ${reviews_per_sale})</property>
+
+    <!--  date_dim -->
+    <property name="${date_dim_begin_date}" type="date">1900-01-01 00:00:00</property>
+
+    <!-- store_sales -->
+    <property name="store_sales_begin_date" type="date">2001-01-01 00:00:00</property>
+    <property name="store_sales_end_date" type="date">2022-03-04 00:00:00</property>
+    <property name="store_sales_days_since_date_begin_date" type="long">(${store_sales_begin_date} - ${date_dim_begin_date}) / ${one_day_in_milliseconds}</property>
+    <property name="store_sales_days_within" type="long">(${store_sales_end_date} - ${store_sales_begin_date}) / ${one_day_in_milliseconds}</property>
+
+    <!-- store_returns -->
+    <property name="SR_MAX_RETURN_DAYS_AFTER_PURCHASE" type="double">715</property>
+
+    <!-- customer -->
+    <property name="preferred_cust_likelihood" type="double">0.5</property>
+
+    <!-- web sales-->
+    <property name="web_sales_begin_date" type="date">2001-01-01 00:00:00</property>
+    <property name="web_sales_end_date" type="date">2022-03-04 00:00:00</property>
+    <property name="web_sales_days_since_date_begin_date" type="long">(${web_sales_begin_date} - ${date_dim_begin_date}) / ${one_day_in_milliseconds}</property>
+    <property name="web_sales_days_within" type="long">(${web_sales_end_date} - ${web_sales_begin_date}) / ${one_day_in_milliseconds}</property>
+
+    <table name="store">
+        <size>${store_size}</size>
+
+        <field name="s_store_sk" size="19" type="BIGINT" primary="true">
+            <gen_IdGenerator>
+                <min>${SK_ID_OFFSET}</min>
+            </gen_IdGenerator>
+        </field>
+
+        <field name="s_store_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="s_store_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="s_store_id" size="16" type="CHAR" primary="false">
+            <gen_RandomAString>
+                <disableRng>true</disableRng>
+                <size>16.0</size>
+                <characters>ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890</characters>
+            </gen_RandomAString>
+        </field>
+
+        <field name="s_store_name" size="50" type="VARCHAR" primary="false">
+            <gen_DictList>
+                <file>dicts/store_name.dict</file>
+            </gen_DictList>
+        </field>
+
+        <field name="s_gmt_offset" size="5" type="NUMERIC" primary="false">
+            <gen_DoubleGenerator>
+                <minD>-12</minD>
+                <maxD>12</maxD>
+                <decimalPlaces>2</decimalPlaces>
+            </gen_DoubleGenerator>
+        </field>
+
+        <field name="s_gmt_offset1" size="5" type="NUMERIC" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="s_gmt_offset" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+    </table>
+
+    <table name="store_sales">
+        <size>${store_sales_size}</size>
+        <field name="ss_sold_date_sk" size="19" type="BIGINT" primary="false">
+            <gen_FormulaGenerator>
+                <formula>${store_sales_days_since_date_begin_date} + Math.floor(gc.getID() * ((${store_sales_days_within} - 1) / ${store_sales_size}))</formula>
+                <decimalPlaces>0</decimalPlaces>
+            </gen_FormulaGenerator>
+        </field>
+
+        <field name="ss_sold_date_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ss_sold_date_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ss_sold_time_sk" size="19" type="BIGINT" primary="false">
+            <gen_LongGenerator>
+                <min>0</min>
+                <max>${one_day_in_milliseconds} / 1000</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="ss_sold_time_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ss_sold_time_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ss_item_sk" size="19" type="BIGINT" primary="true">
+            <gen_LongGenerator>
+                <min>0</min>
+                <max>${item_size}</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="ss_item_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ss_item_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ss_customer_sk" size="19" type="BIGINT" primary="false">
+            <gen_LongGenerator>
+                <min>0</min>
+                <max>${customer_size}</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="ss_customer_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ss_customer_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ss_cdemo_sk" size="19" type="BIGINT" primary="false">
+            <gen_LongGenerator>
+                <min>0</min>
+                <max>1920800L</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="ss_cdemo_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ss_cdemo_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ss_addr_sk" size="19" type="BIGINT" primary="false">
+            <gen_LongGenerator>
+                <min>0</min>
+                <max>${customer_size} / 2</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="ss_addr_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ss_addr_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ss_store_sk" size="19" type="BIGINT" primary="false">
+            <gen_LongGenerator>
+                <min>0</min>
+                <max>${store_size}</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="ss_store_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ss_store_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ss_promo_sk" size="19" type="BIGINT" primary="false">
+            <gen_LongGenerator>
+                <min>0</min>
+                <max>300 * ${SF_log_1.5}</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="ss_promo_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ss_promo_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ss_ticket_number" size="19" type="BIGINT" primary="true">
+            <gen_IdGenerator>
+                <min>${SK_ID_OFFSET}</min>
+            </gen_IdGenerator>
+        </field>
+
+        <field name="ss_ticket_number1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ss_ticket_number" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ss_quantity" size="10" type="INTEGER" primary="false">
+            <gen_LongGenerator>
+                <min>0</min>
+                <max>100</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="ss_quantity1" size="10" type="INTEGER" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ss_quantity" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ss_sales_price" size="7" type="NUMERIC" primary="false">
+            <gen_DoubleGenerator>
+                <minD>0.00d</minD>
+                <maxD>1000.00d</maxD>
+                <decimalPlaces>2</decimalPlaces>
+            </gen_DoubleGenerator>
+        </field>
+
+        <field name="ss_sales_price1" size="7" type="NUMERIC" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ss_sales_price" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ss_ext_discount_amt" size="7" type="NUMERIC" primary="false">
+            <gen_DoubleGenerator>
+                <minD>0.00d</minD>
+                <maxD>1.00d</maxD>
+                <decimalPlaces>2</decimalPlaces>
+            </gen_DoubleGenerator>
+        </field>
+
+        <field name="ss_ext_discount_amt1" size="7" type="NUMERIC" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ss_ext_discount_amt" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ss_ext_sales_price" size="7" type="NUMERIC" primary="false">
+            <gen_DoubleGenerator>
+                <minD>0.00d</minD>
+                <maxD>100000.00d</maxD>
+                <decimalPlaces>2</decimalPlaces>
+            </gen_DoubleGenerator>
+        </field>
+
+        <field name="ss_ext_sales_price1" size="7" type="NUMERIC" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ss_ext_sales_price" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ss_ext_wholesale_cost" size="7" type="NUMERIC" primary="false">
+            <gen_DoubleGenerator>
+                <minD>0.00d</minD>
+                <maxD>100000.00d</maxD>
+                <decimalPlaces>2</decimalPlaces>
+            </gen_DoubleGenerator>
+        </field>
+
+        <field name="ss_ext_wholesale_cost1" size="7" type="NUMERIC" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ss_ext_wholesale_cost" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ss_ext_list_price" size="7" type="NUMERIC" primary="false">
+            <gen_DoubleGenerator>
+                <minD>0.00d</minD>
+                <maxD>100000.00d</maxD>
+                <decimalPlaces>2</decimalPlaces>
+            </gen_DoubleGenerator>
+        </field>
+
+        <field name="ss_ext_list_price1" size="7" type="NUMERIC" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ss_ext_list_price" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ss_net_paid" size="7" type="NUMERIC" primary="false">
+            <gen_DoubleGenerator>
+                <minD>0.00d</minD>
+                <maxD>100000.00d</maxD>
+                <decimalPlaces>2</decimalPlaces>
+            </gen_DoubleGenerator>
+        </field>
+
+        <field name="ss_net_paid1" size="7" type="NUMERIC" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ss_net_paid" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ss_net_profit" size="7" type="NUMERIC" primary="false">
+            <gen_DoubleGenerator>
+                <minD>0.00d</minD>
+                <maxD>100.00d</maxD>
+                <decimalPlaces>2</decimalPlaces>
+            </gen_DoubleGenerator>
+        </field>
+
+        <field name="ss_net_profit1" size="7" type="NUMERIC" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ss_net_profit" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+    </table>
+
+    <table name="web_returns">
+        <size>${web_returns_size}</size>
+        <field name="wr_returned_date_sk" size="19" type="BIGINT" primary="false">
+            <gen_LongGenerator>
+                <min>0</min>
+                <max>${date_dim_size}</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="wr_returned_date_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="wr_returned_date_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="wr_item_sk" size="19" type="BIGINT" primary="true">
+            <gen_LongGenerator>
+                <min>0</min>
+                <max>${item_size}</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="wr_item_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="wr_item_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="wr_order_number" size="19" type="BIGINT" primary="true">
+            <gen_LongGenerator>
+                <min>0</min>
+                <max>${web_sales_size}</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="wr_order_number1" size="19" type="BIGINT" primary="true">
+            <gen_OtherFieldValueGenerator>
+                <reference field="wr_order_number" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="wr_return_quantity" size="10" type="INTEGER" primary="false">
+            <gen_LongGenerator>
+                <min>1</min>
+                <max>100</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="wr_return_quantity1" size="10" type="INTEGER" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="wr_return_quantity" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="wr_refunded_cash" size="7" type="NUMERIC" primary="false">
+            <gen_DoubleGenerator>
+                <minD>0.00d</minD>
+                <maxD>1000.00d</maxD>
+                <decimalPlaces>2</decimalPlaces>
+            </gen_DoubleGenerator>
+        </field>
+
+        <field name="wr_refunded_cash1" size="7" type="NUMERIC" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="wr_refunded_cash" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+    </table>
+
+    <table name="store_returns">
+        <size>${store_returns_size}</size>
+
+        <field name="sr_returned_date_sk" size="19" type="BIGINT" primary="false">
+            <gen_FormulaGenerator>
+                <formula>(long)generator[0]</formula>
+                <decimalPlaces>0</decimalPlaces>
+                <gen_ReferenceGenerator choose="sameChoiceAs" from="">
+                    <sameChoiceAs field="sr_ticket_number"/>
+                    <reference table="store_sales" field="ss_sold_date_sk" />
+                </gen_ReferenceGenerator>
+            </gen_FormulaGenerator>
+        </field>
+
+        <field name="sr_returned_date_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="sr_returned_date_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="sr_item_sk" size="19" type="BIGINT" primary="true">
+            <gen_LongGenerator>
+                <min>0</min>
+                <max>${item_size}</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="sr_item_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="sr_item_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="sr_customer_sk" size="19" type="BIGINT" primary="true">
+            <gen_LongGenerator>
+                <min>0</min>
+                <max>${item_size}</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="sr_customer_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="sr_customer_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="sr_ticket_number" size="19" type="BIGINT" primary="false">
+            <gen_LongGenerator>
+                <min>0</min>
+                <max>${store_sales_size}</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="sr_ticket_number1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="sr_ticket_number" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="sr_return_quantity" size="10" type="INTEGER" primary="false">
+            <gen_LongGenerator>
+                <min>0</min>
+                <max>100</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="sr_return_quantity1" size="10" type="INTEGER" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="sr_return_quantity" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="sr_return_amt" size="7" type="NUMERIC" primary="false">
+            <gen_DoubleGenerator>
+                <minD>0.00d</minD>
+                <maxD>100000.00d</maxD>
+                <decimalPlaces>2</decimalPlaces>
+            </gen_DoubleGenerator>
+        </field>
+
+        <field name="sr_return_amt1" size="7" type="NUMERIC" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="sr_return_amt" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+    </table>
+
+    <table name="customer">
+        <size>${customer_size}</size>
+
+        <field name="c_customer_sk" size="19" type="BIGINT" primary="true">
+            <gen_IdGenerator>
+                <min>${SK_ID_OFFSET}</min>
+            </gen_IdGenerator>
+        </field>
+
+        <field name="c_customer_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="c_customer_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="c_customer_id" size="16" type="CHAR" primary="false">
+            <gen_RandomAString>
+                <disableRng>true</disableRng>
+                <size>16.0</size>
+                <characters>ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890</characters>
+            </gen_RandomAString>
+        </field>
+
+        <field name="c_current_cdemo_sk" size="19" type="BIGINT" primary="false">
+            <gen_LongGenerator>
+                <min>0</min>
+                <max>1920800L</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="c_current_cdemo_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="c_current_cdemo_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="c_current_addr_sk" size="19" type="BIGINT" primary="false">
+            <gen_LongGenerator>
+                <min>0</min>
+                <max>${customer_size} / 2</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="c_current_addr_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="c_current_addr_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="c_name" size="30" type="CHAR" primary="false">
+            <gen_DictList>
+                <file>dicts/name.dict</file>
+            </gen_DictList>
+        </field>
+
+        <field name="c_age" size="10" type="INTEGER" primary="false">
+            <gen_LongGenerator>
+                <min>15</min>
+                <max>40</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="c_age1" size="10" type="INTEGER" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="c_age" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="c_gender" size="5" type="CHAR">
+            <gen_DictList>
+                <file>dicts/gender.dict</file>
+            </gen_DictList>
+        </field>
+
+        <field name="c_province" size="10" type="VARCHAR">
+            <gen_DictList>
+                <file>dicts/province.dict</file>
+            </gen_DictList>
+        </field>
+
+        <field name="c_nationality" size="5" type="VARCHAR">
+            <gen_DictList>
+                <file>dicts/nationality.dict</file>
+            </gen_DictList>
+        </field>
+
+        <field name="c_preferred_cust_flag" size="1" type="CHAR" primary="false">
+            <gen_ProbabilityGenerator>
+                <probability value="${preferred_cust_likelihood}">
+                    <gen_StaticValueGenerator>
+                        <value>Y</value>
+                    </gen_StaticValueGenerator>
+                </probability>
+                <probability value="1 - ${preferred_cust_likelihood}">
+                    <gen_StaticValueGenerator>
+                        <value>N</value>
+                    </gen_StaticValueGenerator>
+                </probability>
+            </gen_ProbabilityGenerator>
+        </field>
+
+        <field name="c_birth_country" size="20" type="VARCHAR" primary="false">
+            <gen_DictList>
+                <file>dicts/country.dict</file>
+            </gen_DictList>
+        </field>
+
+        <field name="c_login" size="13" type="CHAR" primary="false">
+            <gen_RandomAString>
+                <min>1.0</min>
+                <size>13.0</size>
+                <characters>ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890</characters>
+            </gen_RandomAString>
+        </field>
+
+        <field name="c_email_address" size="50" type="CHAR" primary="false">
+            <gen_RandomAString>
+                <min>20.0</min>
+                <size>50.0</size>
+                <characters>ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890</characters>
+            </gen_RandomAString>
+        </field>
+
+    </table>
+
+    <table name="web_sales">
+        <size>${web_sales_size}</size>
+        <field name="ws_sk" size="19" type="BIGINT" primary="true">
+            <gen_IdGenerator>
+                <min>${SK_ID_OFFSET}</min>
+            </gen_IdGenerator>
+        </field>
+
+        <field name="ws_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ws_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ws_sold_date_sk" size="19" type="BIGINT" primary="false">
+            <gen_FormulaGenerator>
+                <formula>${web_sales_days_since_date_begin_date} + Math.floor(gc.getID() * ((${web_sales_days_within} - 1) / ${web_sales_size}))</formula>
+                <decimalPlaces>0</decimalPlaces>
+            </gen_FormulaGenerator>
+        </field>
+
+        <field name="ws_sold_date_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ws_sold_date_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ws_sold_time_sk" size="19" type="BIGINT" primary="false">
+            <gen_LongGenerator>
+                <min>0</min>
+                <max>${one_day_in_milliseconds} / 1000</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="ws_sold_time_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ws_sold_time_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ws_item_sk" size="19" type="BIGINT" primary="true">
+            <gen_LongGenerator>
+                <min>0</min>
+                <max>${item_size}</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="ws_item_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ws_item_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ws_bill_customer_sk" size="19" type="BIGINT" primary="false">
+            <gen_LongGenerator>
+                <min>0</min>
+                <max>${customer_size}</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="ws_bill_customer_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ws_bill_customer_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ws_ship_hdemo_sk" size="19" type="BIGINT" primary="false">
+            <gen_LongGenerator>
+                <min>0</min>
+                <max>7200L</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="ws_ship_hdemo_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ws_ship_hdemo_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ws_web_page_sk" size="19" type="BIGINT" primary="false">
+            <gen_LongGenerator>
+                <min>0</min>
+                <max>60 * ${SF_log_1.5}</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="ws_web_page_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ws_web_page_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ws_warehouse_sk" size="19" type="BIGINT" primary="false">
+            <gen_LongGenerator>
+                <min>0</min>
+                <max>5.0d * ${SF_log_5}</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="ws_warehouse_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ws_warehouse_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ws_order_number" size="19" type="BIGINT" primary="true">
+            <gen_IdGenerator>
+                <min>${SK_ID_OFFSET}</min>
+            </gen_IdGenerator>
+        </field>
+
+        <field name="ws_order_number1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ws_order_number" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ws_quantity" size="10" type="INTEGER" primary="false">
+            <gen_LongGenerator>
+                <min>0</min>
+                <max>100</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="ws_quantity1" size="10" type="INTEGER" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ws_quantity" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ws_sales_price" size="7" type="NUMERIC" primary="false">
+            <gen_FormulaGenerator>
+                <formula>generator[0] * (1 - generator[1])</formula>
+                <decimalPlaces>2</decimalPlaces>
+                <gen_DoubleGenerator>
+                    <minD>1.00d</minD>
+                    <maxD>1000.00d</maxD>
+                    <decimalPlaces>2</decimalPlaces>
+                </gen_DoubleGenerator>
+                <gen_DoubleGenerator>
+                    <minD>0.00d</minD>
+                    <maxD>1.00d</maxD>
+                    <decimalPlaces>2</decimalPlaces>
+                </gen_DoubleGenerator>
+            </gen_FormulaGenerator>
+        </field>
+
+        <field name="ws_sales_price1" size="7" type="NUMERIC" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ws_sales_price" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ws_ext_discount_amt" size="7" type="NUMERIC" primary="false">
+            <gen_FormulaGenerator>
+                <formula>generator[0] - generator[1]</formula>
+                <decimalPlaces>2</decimalPlaces>
+                <gen_OtherFieldValueGenerator>
+                    <reference field="ws_ext_list_price" />
+                </gen_OtherFieldValueGenerator>
+                <gen_OtherFieldValueGenerator>
+                    <reference field="ws_ext_sales_price" />
+                </gen_OtherFieldValueGenerator>
+            </gen_FormulaGenerator>
+        </field>
+
+        <field name="ws_ext_discount_amt1" size="7" type="NUMERIC" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ws_ext_discount_amt" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ws_ext_sales_price" size="7" type="NUMERIC" primary="false">
+            <gen_FormulaGenerator>
+                <formula>generator[0] * generator[1]</formula>
+                <gen_OtherFieldValueGenerator>
+                    <reference field="ws_sales_price" />
+                </gen_OtherFieldValueGenerator>
+                <gen_OtherFieldValueGenerator>
+                    <reference field="ws_quantity" />
+                </gen_OtherFieldValueGenerator>
+                <decimalPlaces>2</decimalPlaces>
+            </gen_FormulaGenerator>
+        </field>
+
+        <field name="ws_ext_sales_price1" size="7" type="NUMERIC" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ws_ext_sales_price" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ws_ext_wholesale_cost" size="7" type="NUMERIC" primary="false">
+            <gen_FormulaGenerator>
+                <formula>generator[0] * generator[1]</formula>
+                <gen_DoubleGenerator>
+                    <minD>1.00d</minD>
+                    <maxD>1000.00d</maxD>
+                    <decimalPlaces>2</decimalPlaces>
+                </gen_DoubleGenerator>
+                <gen_OtherFieldValueGenerator>
+                    <reference field="ws_quantity" />
+                </gen_OtherFieldValueGenerator>
+                <decimalPlaces>2</decimalPlaces>
+            </gen_FormulaGenerator>
+        </field>
+
+        <field name="ws_ext_wholesale_cost1" size="7" type="NUMERIC" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ws_ext_wholesale_cost" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ws_ext_list_price" size="7" type="NUMERIC" primary="false">
+            <gen_FormulaGenerator>
+                <formula>generator[0] * generator[1]</formula>
+                <gen_DoubleGenerator>
+                    <minD>1.00d</minD>
+                    <maxD>1000.00d</maxD>
+                    <decimalPlaces>2</decimalPlaces>
+                </gen_DoubleGenerator>
+                <gen_OtherFieldValueGenerator>
+                    <reference field="ws_quantity" />
+                </gen_OtherFieldValueGenerator>
+                <decimalPlaces>2</decimalPlaces>
+            </gen_FormulaGenerator>
+        </field>
+
+        <field name="ws_ext_list_price1" size="7" type="NUMERIC" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ws_ext_list_price" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="ws_net_paid" size="7" type="NUMERIC" primary="false">
+            <gen_FormulaGenerator>
+                <formula>generator[0] - generator[1]</formula>
+                <gen_OtherFieldValueGenerator>
+                    <reference field="ws_ext_sales_price" />
+                </gen_OtherFieldValueGenerator>
+                <gen_DoubleGenerator>
+                    <minD>1.00d</minD>
+                    <maxD>1000.00d</maxD>
+                    <decimalPlaces>2</decimalPlaces>
+                </gen_DoubleGenerator>
+                <decimalPlaces>2</decimalPlaces>
+            </gen_FormulaGenerator>
+        </field>
+
+        <field name="ws_net_paid1" size="7" type="NUMERIC" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="ws_net_paid" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+
+    </table>
+
+    <table name="item">
+        <size>${item_size}</size>
+        <field name="i_item_sk" size="19" type="BIGINT" primary="true">
+            <gen_IdGenerator>
+                <min>${SK_ID_OFFSET}</min>
+            </gen_IdGenerator>
+        </field>
+
+        <field name="i_item_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="i_item_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="i_item_id" size="16" type="CHAR" primary="false">
+            <gen_RandomAString>
+                <disableRng>true</disableRng>
+                <size>16.0</size>
+                <characters>ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890</characters>
+            </gen_RandomAString>
+        </field>
+
+        <field name="i_item_desc" size="200" type="VARCHAR" primary="false">
+            <gen_DictList>
+                <file>dicts/desc.dict</file>
+                >
+            </gen_DictList>
+        </field>
+
+        <field name="i_current_price" size="7" type="NUMERIC" primary="false">
+            <gen_DoubleGenerator>
+                <minD>0.09d</minD>
+                <maxD>99.99d</maxD>
+                <decimalPlaces>2</decimalPlaces>
+            </gen_DoubleGenerator>
+        </field>
+
+        <field name="i_current_price1" size="7" type="NUMERIC" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="i_current_price" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="i_class_id" size="10" type="INTEGER" primary="false">
+            <gen_LongGenerator>
+                <min>0</min>
+                <max>80</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="i_class_id1" size="10" type="INTEGER" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="i_class_id" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="i_category_id" size="10" type="INTEGER" primary="false">
+            <gen_LongGenerator>
+                <min>0</min>
+                <max>80</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="i_category_id1" size="10" type="INTEGER" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="i_category_id" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="i_category" size="50" type="CHAR" primary="false">
+            <gen_DictList>
+                <file>dicts/category.dict</file>
+            </gen_DictList>
+        </field>
+    </table>
+
+    <table name="product_reviews">
+        <size>${product_reviews_size}</size>
+
+        <field name="pr_review_sk" size="19" type="BIGINT" primary="true">
+            <gen_IdGenerator>
+                <min>${SK_ID_OFFSET}</min>
+            </gen_IdGenerator>
+        </field>
+
+        <field name="pr_review_sk1" size="19" type="BIGINT" primary="true">
+            <gen_OtherFieldValueGenerator>
+                <reference field="pr_review_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="pr_review_date" size="13" type="CHAR" primary="false">
+            <gen_DateGenerator>
+                <startDate>2001-01-01 00:00:00</startDate>
+                <endDate>2022-03-02 00:00:00</endDate>
+                <format>yyyy-MM-dd</format>
+            </gen_DateGenerator>
+        </field>
+
+        <field name="pr_review_rating" size="10" type="INTEGER" primary="false">
+            <gen_LongGenerator>
+                <min>1</min>
+                <max>5</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="pr_review_rating1" size="10" type="INTEGER" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="pr_review_rating" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="pr_item_sk" size="19" type="BIGINT" primary="false">
+            <gen_LongGenerator>
+                <min>0</min>
+                <max>${item_size}</max>
+            </gen_LongGenerator>
+        </field>
+
+        <field name="pr_item_sk1" size="19" type="BIGINT" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="pr_item_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="pr_review_content" size="0" type="LONGVARCHAR" primary="false">
+            <gen_RandomAString>
+                <disableRng>true</disableRng>
+                <size>150.0</size>
+                <characters>ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890</characters>
+            </gen_RandomAString>
+        </field>
+    </table>
+
+    <table name="date_dim">
+        <size>${date_dim_size}</size>
+
+        <field name="d_date_sk" size="19" type="BIGINT" primary="true">
+            <gen_IdGenerator>
+                <min>${SK_ID_OFFSET}</min>
+            </gen_IdGenerator>
+        </field>
+
+        <field name="d_date_sk1" size="19" type="BIGINT" primary="true">
+            <gen_OtherFieldValueGenerator>
+                <reference field="d_date_sk" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+        <field name="d_date" size="13" type="CHAR" primary="false">
+            <gen_DateGenerator>
+                <disableRng>false</disableRng>
+                <startDate>2001-01-01 00:00:00</startDate>
+                <endDate>2022-03-02 00:00:00</endDate>
+                <format>yyyy-MM-dd</format>
+            </gen_DateGenerator>
+        </field>
+
+        <field name="d_year" size="10" type="INTEGER" primary="false">
+            <gen_DetailFromDateGenerator>
+                <reference field="d_date" />
+                <type>year</type>
+            </gen_DetailFromDateGenerator>
+        </field>
+
+        <field name="d_year1" size="10" type="INTEGER" primary="false">
+            <gen_OtherFieldValueGenerator>
+                <reference field="d_year" />
+            </gen_OtherFieldValueGenerator>
+        </field>
+
+    </table>
+</schema>
