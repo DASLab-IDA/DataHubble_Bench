@@ -10,7 +10,7 @@
 cd /Wide_table/DataGeneration/pdgf
 ./generate_table.sh 1000
 ```
-生成的数据表默认存放在/pdgf/output文件夹下。
+生成的数据表默认存放在/Wide_table/DataGeneration/pdgf/output文件夹下。
 ### 4、将生成的数据上传到HDFS并建立hive外部表fact：
 ```
 Create external table fact
@@ -28,7 +28,7 @@ province STRING,
 nationality STRING)
 ROW FORMAT DELIMITED FIELDS TERMINATED BY '|' STORED AS TEXTFILE;
 
-LOAD DATA LOCAL INPATH '/home/scidb/DataGeneration/pdgf/output/websales_home_myshop_fact_table.dat' INTO TABLE fact;
+LOAD DATA LOCAL INPATH '/Wide_table/DataGeneration/pdgf/output/websales_home_myshop_fact_table.dat' INTO TABLE fact;
 ```
 真实数据则作为dimension表（/Wide_table/DataGeneration/table/dimension_table.csv），上传到HDFS并建立hive外部表的方式类似，这里就不再赘述了。
 ### 5、在hive中将fact表和dimension表join生成最终的数据表，即为最终的宽表：
@@ -74,7 +74,7 @@ STORED AS TEXTFILE;
 ```
 之后将“.dat“文件中的数据导入hive中：
 ```
-LOAD DATA LOCAL INPATH '/home/scidb/DataGeneration/pdgf/output
+LOAD DATA LOCAL INPATH '/Multi_table/pdgf/output
 /store_returns.dat' 
 INTO TABLE ITEM_RAW;
 ```
@@ -91,7 +91,7 @@ desc STRING
 )
 ROW FORMAT DELIMITED FIELDS TERMINATED BY '|' STORED AS TEXTFILE;
 
-LOAD DATA LOCAL INPATH '/home/scidb/DataGeneration/table/dimension_table.csv' INTO TABLE demension;
+LOAD DATA LOCAL INPATH '/Wide_table/DataGeneration/table/dimension_table.csv' INTO TABLE demension;
 ```
 而真实数据则作为dimension表（/Wide_table/DataGeneration/table/dimension_table.csv），上传到HDFS并建立hive外部表的方式类似，这里就不再赘述了。
 建立新的item表，此处为item_2，将真实的数据从demension导入到item_2中： 
