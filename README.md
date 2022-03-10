@@ -78,7 +78,7 @@ ROW FORMAT DELIMITED FIELDS TERMINATED BY '|' STORED AS TEXTFILE;
 
 LOAD DATA LOCAL INPATH '/Wide_table/DataGeneration/pdgf/output/websales_home_myshop_fact_table.dat' INTO TABLE fact;
 ```
-### 5、导入真实数据并建立dimension表
+### 5、建立dimension表并导入真实数据
 真实数据作为dimension表（/Wide_table/DataGeneration/table/dimension_table.csv），需要先建立hive的外部表并将数据导入：
 ```
 Create external table dimension
