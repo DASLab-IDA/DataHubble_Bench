@@ -1,4 +1,4 @@
-# -DataHubble_DataGeneration-
+# -DataHubble_Bench-
 ## 一、DataHubble一张宽表数据生成说明
 数据生成主要建立在数据基准TPCx-BB的基础上，同时参考了一些真实数据，根据系统优化以后，提供指定大小的一张宽表。
 ### 1、指定输出数据的格式和位置
