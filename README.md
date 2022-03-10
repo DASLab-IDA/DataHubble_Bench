@@ -2,7 +2,7 @@
 DataHubble-Bench中包括数据的生成程序、步骤文档以及某电商的原始数据，其中数据生成主要建立在数据基准TPCx-BB的基础上，同时参考了真实数据，根据系统优化以后，可以提供指定大小的宽表与多表数据，其中宽表中的数据全部来源于多表。
 ## 一、DataHubble多表数据生成说明
 ### 1、数据生成
-数据生成使用了TPCx-BB Tools中data-generator文件夹中的pdgf.jar工具进行数据生成，生成指令如下：
+数据生成使用了TPCx-BB Tools中data-generator文件夹中的pdgf.jar工具（/Multi_table/pdgf/）进行数据生成，生成指令如下：
 ```
 java -jar pdgf.jar -l schema.xml -l generation.xml -c -s -sf 1
 ```
