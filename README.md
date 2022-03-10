@@ -24,7 +24,7 @@ INTO TABLE ITEM_RAW;
 ```
 其余8张表也是类似的方法。
 ### 3、融合真实数据
-需要将真实数据融合到新建的多表中的item表，首先将真实的数据上传到HDFS并建立hive外部表dimension，并将/Wide_table/DataGeneration/table/dimension_table.csv处的数据导入：
+需要将真实数据融合到新建的多表中的item表，首先建立hive的外部表dimension，并将/Wide_table/DataGeneration/table/dimension_table.csv处的数据导入：
 ```
 Create external table dimension
 (item_id INT,
@@ -79,7 +79,7 @@ ROW FORMAT DELIMITED FIELDS TERMINATED BY '|' STORED AS TEXTFILE;
 LOAD DATA LOCAL INPATH '/Wide_table/DataGeneration/pdgf/output/websales_home_myshop_fact_table.dat' INTO TABLE fact;
 ```
 ### 5、导入真实数据并建立dimension表
-真实数据作为dimension表（/Wide_table/DataGeneration/table/dimension_table.csv），需要将其上传到HDFS并建立hive外部表：
+真实数据作为dimension表（/Wide_table/DataGeneration/table/dimension_table.csv），需要先建立hive的外部表并将数据导入：
 ```
 Create external table dimension
 (item_id INT,
