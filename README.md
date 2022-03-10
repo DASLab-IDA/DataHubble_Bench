@@ -7,7 +7,7 @@ DataHubble-Bench中包括数据的生成程序、步骤文档以及某电商的�
 java -jar pdgf.jar -l schema.xml -l generation.xml -c -s -sf 1
 ```
 该命令生成的9张表总大小约为100MB，使用默认SF=1（scale factor），可以根据实际的需求调整sf的大小。
-和宽表类似，上面的两个XML文件为config文件夹下的配置文件，其中schema.xml是对于生成数据的schema的描述，generation.xml则配置数据输出时的相应信息。
+上面的两个XML文件为config文件夹下的配置文件，其中schema.xml是对于生成数据的schema的描述，generation.xml则配置数据输出时的相应信息。
 生成的数据在“/Multi_table/pdgf/output”目录下，为“.dat“文件
 ### 2、导入数据
 将数据导入hive，首先定义表结构，以store_returns表为例，如下所示：
